@@ -1,0 +1,112 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// User management
+model User {
+  id             String           @id @default(uuid())
+  email          String           @unique
+  password       String
+  name           String
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  portfolios     Portfolio[]
+  financialGoals FinancialGoal[]
+}
+
+// Portfolio management
+model Portfolio {
+  id        String      @id @default(uuid())
+  name      String
+  userId    String
+  user      User        @relation(fields: [userId], references: [id])
+  assets    Asset[]
+  loans     Loan[]
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+}
+
+// Asset tracking
+model Asset {
+  id              String         @id @default(uuid())
+  name            String
+  assetType       String        // Will store the asset type as a string
+  purchaseDate    DateTime
+  purchaseValue   Float
+  currentValue    Float
+  quantity        Float?
+  portfolioId     String
+  portfolio       Portfolio      @relation(fields: [portfolioId], references: [id])
+  goalAllocations GoalAsset[]
+  transactions    Transaction[]
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  // Metadata fields
+  symbol          String?       // For stocks and mutual funds
+  description     String?       // General description
+  category        String?       // Sub-category within asset type
+  provider        String?       // Bank/broker/insurance provider
+  maturityDate    DateTime?     // For FDs, bonds, insurance
+  interestRate    Float?        // For FDs, bonds
+}
+
+// Financial goals
+model FinancialGoal {
+  id          String      @id @default(uuid())
+  name        String
+  targetDate  DateTime
+  targetAmount Float
+  userId      String
+  user        User        @relation(fields: [userId], references: [id])
+  assets      GoalAsset[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+// Asset to Goal mapping
+model GoalAsset {
+  id             String        @id @default(uuid())
+  goalId         String
+  goal           FinancialGoal @relation(fields: [goalId], references: [id])
+  assetId        String
+  asset          Asset         @relation(fields: [assetId], references: [id])
+  allocationPercentage Float
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+}
+
+// Loan tracking
+model Loan {
+  id           String    @id @default(uuid())
+  name         String
+  amount       Float
+  interestRate Float
+  startDate    DateTime
+  endDate      DateTime
+  portfolioId  String
+  portfolio    Portfolio @relation(fields: [portfolioId], references: [id])
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+// Transaction history
+model Transaction {
+  id        String   @id @default(uuid())
+  type      String   // BUY, SELL, DIVIDEND, INTEREST, etc.
+  date      DateTime
+  amount    Float
+  quantity  Float?
+  assetId   String
+  asset     Asset    @relation(fields: [assetId], references: [id])
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
