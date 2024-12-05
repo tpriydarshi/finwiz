@@ -19,6 +19,16 @@ A comprehensive financial portfolio tracker designed for the Indian market with 
 - UI Framework: Material-UI
 - Charts: Chart.js
 
+## Prerequisites
+
+- Node.js >= 18.0.0
+- Yarn >= 1.22.0 (npm is not supported)
+
+To install Yarn, run:
+```bash
+npm install -g yarn
+```
+
 ## Project Structure
 
 ```
@@ -47,8 +57,13 @@ This will start both the frontend and backend development servers.
 
 ## Development
 
-- Frontend: http://localhost:5173
-- Backend: http://localhost:3000
+- Frontend: http://localhost:3000
+- Backend: http://localhost:3001
+
+## Important Notes
+
+- This project uses Yarn workspaces for package management. Please do not use npm as it may cause dependency issues.
+- Make sure to commit the `yarn.lock` file to ensure consistent dependencies across all environments.
 
 ## License
 
