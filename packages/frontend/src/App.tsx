@@ -11,6 +11,8 @@ import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { Login } from './pages/auth/Login';
 import { Register } from './pages/auth/Register';
 import { Settings } from './pages/Settings';
+import { Portfolio } from './pages/Portfolio';
+import { FamilyPage } from './pages/Family';
 
 // Create a client for React Query
 const queryClient = new QueryClient();
@@ -31,15 +33,15 @@ function App() {
               path="/"
               element={
                 <ProtectedRoute>
-                  <div>Dashboard (Coming Soon)</div>
+                  <FamilyPage />
                 </ProtectedRoute>
               }
             />
             <Route
-              path="/portfolio"
+              path="/portfolio/:familyId"
               element={
                 <ProtectedRoute>
-                  <div>Portfolio (Coming Soon)</div>
+                  <Portfolio />
                 </ProtectedRoute>
               }
             />

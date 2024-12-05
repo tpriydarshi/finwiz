@@ -17,7 +17,6 @@ import {
 import {
   Menu as MenuIcon,
   Dashboard,
-  AccountBalance,
   Timeline,
   Assessment,
   Settings,
@@ -38,8 +37,7 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
   const navigate = useNavigate();
 
   const menuItems = [
-    { text: 'Dashboard', icon: <Dashboard />, path: '/' },
-    { text: 'Portfolio', icon: <AccountBalance />, path: '/portfolio' },
+    { text: 'Families', icon: <Dashboard />, path: '/' },
     { text: 'Goals', icon: <Timeline />, path: '/goals' },
     { text: 'Reports', icon: <Assessment />, path: '/reports' },
     { text: 'Settings', icon: <Settings />, path: '/settings' },

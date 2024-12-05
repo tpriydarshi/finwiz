@@ -10,35 +10,56 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// User management
+// User authentication
 model User {
-  id             String           @id @default(uuid())
-  email          String           @unique
-  password       String
-  name           String
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
-  portfolios     Portfolio[]
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Family management
+model Family {
+  id          String         @id @default(uuid())
+  name        String
+  description String?
+  members     FamilyMember[]
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+}
+
+model FamilyMember {
+  id            String          @id @default(uuid())
+  name          String
+  email         String          @unique
+  role          String          // HEAD, MEMBER
+  familyId      String
+  family        Family          @relation(fields: [familyId], references: [id])
+  portfolios    Portfolio[]
   financialGoals FinancialGoal[]
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
 }
 
 // Portfolio management
 model Portfolio {
-  id        String      @id @default(uuid())
-  name      String
-  userId    String
-  user      User        @relation(fields: [userId], references: [id])
-  assets    Asset[]
-  loans     Loan[]
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+  id            String       @id @default(uuid())
+  name          String
+  description   String?
+  memberId      String
+  member        FamilyMember @relation(fields: [memberId], references: [id])
+  assets        Asset[]
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
 }
 
 // Asset tracking
 model Asset {
   id              String         @id @default(uuid())
   name            String
-  assetType       String        // Will store the asset type as a string
+  assetType       String        // STOCK, BOND, REAL_ESTATE, CASH, etc.
   purchaseDate    DateTime
   purchaseValue   Float
   currentValue    Float
@@ -46,7 +67,6 @@ model Asset {
   portfolioId     String
   portfolio       Portfolio      @relation(fields: [portfolioId], references: [id])
   goalAllocations GoalAsset[]
-  transactions    Transaction[]
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
   // Metadata fields
@@ -60,53 +80,25 @@ model Asset {
 
 // Financial goals
 model FinancialGoal {
-  id          String      @id @default(uuid())
-  name        String
-  targetDate  DateTime
-  targetAmount Float
-  userId      String
-  user        User        @relation(fields: [userId], references: [id])
-  assets      GoalAsset[]
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  id            String      @id @default(uuid())
+  name          String
+  targetDate    DateTime
+  targetAmount  Float
+  memberId      String
+  member        FamilyMember @relation(fields: [memberId], references: [id])
+  assets        GoalAsset[]
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
 }
 
 // Asset to Goal mapping
 model GoalAsset {
-  id             String        @id @default(uuid())
-  goalId         String
-  goal           FinancialGoal @relation(fields: [goalId], references: [id])
-  assetId        String
-  asset          Asset         @relation(fields: [assetId], references: [id])
+  id                  String        @id @default(uuid())
+  goalId              String
+  goal                FinancialGoal @relation(fields: [goalId], references: [id])
+  assetId             String
+  asset               Asset         @relation(fields: [assetId], references: [id])
   allocationPercentage Float
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
-}
-
-// Loan tracking
-model Loan {
-  id           String    @id @default(uuid())
-  name         String
-  amount       Float
-  interestRate Float
-  startDate    DateTime
-  endDate      DateTime
-  portfolioId  String
-  portfolio    Portfolio @relation(fields: [portfolioId], references: [id])
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-}
-
-// Transaction history
-model Transaction {
-  id        String   @id @default(uuid())
-  type      String   // BUY, SELL, DIVIDEND, INTEREST, etc.
-  date      DateTime
-  amount    Float
-  quantity  Float?
-  assetId   String
-  asset     Asset    @relation(fields: [assetId], references: [id])
-  notes     String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
 }
